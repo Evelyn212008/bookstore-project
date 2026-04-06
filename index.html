@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Digital Bookshelf</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #fdf5e6;
+            color: #4a3728;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border-color: #ff9800;
+        }
+
+        .shelf-container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+
+        h1 {
+            border-bottom: 4px solid #8b4513;
+            padding-bottom: 10px;
+            color: #8b4513;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .book-card {
+            background: white;
+            padding: 15px;
+            border-left: 10px solid #8b4513;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        button {
+            background-color: #8b4513;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="shelf-container">
+    <h1>📚 My Personal Library</h1>
+
+    <input type="text" id="bookSearch" placeholder="Search for a book...">
+
+    <div class="book-grid">
+        <div class="book-card">
+            <span class="book-title">Alchemist</span>
+            <p>by Paulo Coelho</p>
+            <button onclick="selectProduct('Alchemist','$25.00')">Order Now</button>
+        </div>
+
+        <div class="book-card">
+            <span class="book-title">Atomic Habits</span>
+            <p>by James Clear</p>
+            <button onclick="selectProduct('Atomic Habits','$20.00')">Order Now</button>
+        </div>
+
+        <div class="book-card">
+            <span class="book-title">To Kill a Mockingbird</span>
+            <p>by Harper Lee</p>
+            <button onclick="selectProduct('To Kill a Mockingbird','$22.00')">Order Now</button>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<section id="order-form-section">
+    <h2>Order Form</h2>
+    <form id="main-form">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="product" id="product-display" readonly placeholder="Select a book" required>
+        <input type="number" name="quantity" value="1" min="1">
+        <button type="submit">Send Order Request</button>
+    </form>
+</section>
+
+<script>
+    const searchInput = document.getElementById('bookSearch');
+    const bookCards = document.querySelectorAll('.book-card');
+
+    searchInput.addEventListener('input', () => {
+        const filter = searchInput.value.toLowerCase();
+        bookCards.forEach(card => {
+            const title = card.querySelector('.book-title').innerText.toLowerCase();
+            card.style.display = title.includes(filter) ? "" : "none";
+        });
+    });
+
+    function selectProduct(bookName, price) {
+        document.getElementById('product-display').value = bookName + " - " + price;
+        document.getElementById('order-form-section')
+            .scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ✅ Connect to Node.js backend
+    document.getElementById("main-form").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const formData = {
+            name: this.name.value,
+            email: this.email.value,
+            product: this.product.value,
+            quantity: this.quantity.value
+        };
+
+        const response = await fetch("http://localhost:3000/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        alert(await response.text());
+    });
+</script>
+
+</body>
+</html>
